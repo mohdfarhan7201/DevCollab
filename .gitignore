@@ -1,3 +1,5 @@
 node_modules
 .env
 dist
+InterviewQues.md
+app&server.md
