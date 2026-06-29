@@ -57,6 +57,17 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+const bcrypt = require("bcrypt");
+
+userSchema.pre("save", async function (next) {
+
+    if (!this.isModified("password")) return next();
+
+    this.password = await bcrypt.hash(this.password, 10);
+
+    next();
+
+});
 
 // 👇 Sabse last me model export karte hain
 module.exports = mongoose.model("User", userSchema);

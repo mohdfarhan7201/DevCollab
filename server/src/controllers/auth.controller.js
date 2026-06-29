@@ -5,6 +5,8 @@ const asyncHandler=require("../utils/asyncHandler");
 
 const ApiError=require("../utils/apiError");
 
+
+//  Register User
 const registerUser = asyncHandler(async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
@@ -87,6 +89,47 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+
+//  Login User
+const loginUser = asyncHandler(async (req, res) => {
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        throw new ApiError(400, "Email and Password are required");
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+        throw new ApiError(401, "User not found");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Invalid credentials");
+    }
+
+    const userResponse = {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+    };
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            "User logged in successfully",
+            userResponse
+        )
+    );
+
+});
+
 module.exports = {
   registerUser,
+  loginUser
 };
