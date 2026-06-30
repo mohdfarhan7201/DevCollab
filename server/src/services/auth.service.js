@@ -46,6 +46,57 @@ const registerUserService = async (userData) => {
   return createdUser;
 };
 
+
+
+
+const loginUserService = async (loginData) => {
+
+    const { email, password } = loginData;
+
+    if (!email || !password) {
+        throw new ApiError(400, "Email and Password are required");
+    }
+
+    const user = await User.findOne({
+        $or: [
+            { email },
+            { username: email }
+        ]
+    }).select("+password");
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const isPasswordValid = await user.isPasswordCorrect(password);
+
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Invalid credentials");
+    }
+
+    const accessToken = user.generateAccessToken();
+
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+
+    await user.save({ validateBeforeSave: false });
+
+    return {
+        user: {
+            _id: user._id,
+            name: user.name,
+            username: user.username,
+            email: user.email,
+            avatar: user.avatar,
+        },
+        accessToken,
+        refreshToken,
+    };
+
+};
+
 module.exports = {
   registerUserService,
+  loginUserService,
 };

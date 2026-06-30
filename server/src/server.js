@@ -16,3 +16,4 @@ const startServer = async () => {
 };
 
 startServer();
+// reloading server to reload env variables
