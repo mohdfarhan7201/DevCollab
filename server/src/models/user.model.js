@@ -36,9 +36,15 @@ const userSchema = new mongoose.Schema(
     },
 
     avatar: {
-      type: String,
-      default: "",
+    url: {
+        type: String,
+        default: "",
     },
+    public_id: {
+        type: String,
+        default: "",
+    },
+},
 
     bio: {
       type: String,
@@ -52,10 +58,45 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
+location: {
+  type: String,
+  default: "",
+},
+
+github: {
+  type: String,
+  default: "",
+},
+
+linkedin: {
+  type: String,
+  default: "",
+},
+
+portfolio: {
+  type: String,
+  default: "",
+},
+
+followers: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+],
+
+following: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+],
+
     isVerified: {
       type: Boolean,
       default: false,
     },
+    
 
     refreshToken: {
       type: String,
