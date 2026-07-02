@@ -1,64 +1,43 @@
 const mongoose = require("mongoose");
 
-const projectSchema = new mongoose.Schema(
+const postSchema = new mongoose.Schema(
   {
-    title: {
+    content: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 100,
-    },
-
-    description: {
-      type: String,
-      required: true,
       maxlength: 1000,
     },
 
-    techStack: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
-
-    githubUrl: {
-      type: String,
-      default: "",
-    },
-
-    liveUrl: {
-      type: String,
-      default: "",
-    },
-
-    thumbnail: {
+    image: {
       url: {
         type: String,
         default: "",
       },
+
       public_id: {
         type: String,
         default: "",
       },
     },
 
-    owner: {
+    author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
     likes: [
-    {
+      {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-    },
-],
+      },
+    ],
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Project", projectSchema);
+module.exports = mongoose.model("Post", postSchema);

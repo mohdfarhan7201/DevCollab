@@ -9,8 +9,13 @@ const {
     createProject,
     getAllProjects,
     getProjectById,
+    updateProject,
+    deleteProject,
+    getMyProjects,
+    getUserProjects,
 } = require("../controllers/project.controller");
 
+// Create Project
 router.post(
     "/",
     verifyJWT,
@@ -18,16 +23,58 @@ router.post(
     createProject
 );
 
+// Get All Projects
 router.get(
     "/",
     verifyJWT,
     getAllProjects
 );
 
+// Get My Projects
+router.get(
+    "/my-projects",
+    verifyJWT,
+    getMyProjects
+);
+
+//Get User Id 
+router.get(
+    "/user/:userId",
+    verifyJWT,
+    getUserProjects
+);
+
+// Get Single Project
 router.get(
     "/:projectId",
     verifyJWT,
     getProjectById
 );
+
+// Update Project
+router.patch(
+    "/:projectId",
+    verifyJWT,
+    upload.single("thumbnail"),
+    updateProject
+);
+
+// Delete Project
+router.delete(
+    "/:projectId",
+    verifyJWT,
+    deleteProject
+);
+
+router.post(
+
+    "/:projectId/like",
+
+    verifyJWT,
+
+    toggleLike
+
+);
+
 
 module.exports = router;

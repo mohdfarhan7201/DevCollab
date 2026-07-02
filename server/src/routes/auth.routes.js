@@ -12,11 +12,14 @@ const {
   getCurrentUser,
 } = require("../controllers/auth.controller");
 
+const validate = require("../middlewares/validate.middleware");
+const { registerSchema, loginSchema } = require("../validations/auth.validation");
+
 // Public Routes
 
-router.post("/register", registerUser);
+router.post("/register", validate(registerSchema), registerUser);
 
-router.post("/login", loginUser);
+router.post("/login", validate(loginSchema), loginUser);
 
 router.post("/refresh-token", refreshAccessToken);
 
