@@ -13,6 +13,7 @@ const {
     deleteProject,
     getMyProjects,
     getUserProjects,
+    toggleLike
 } = require("../controllers/project.controller");
 
 // Create Project
