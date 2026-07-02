@@ -6,6 +6,8 @@ const verifyJWT = require("../middlewares/auth.middleware");
 
 const upload = require("../middlewares/upload.middleware");
 
+const commentRoutes = require("./comment.routes");
+
 const {
     createPost,
     getAllPosts,
@@ -13,6 +15,7 @@ const {
     updatePost,
     deletePost,
     toggleLike,
+    
 } = require("../controllers/post.controller");
 
 router.post(
@@ -51,6 +54,12 @@ router.patch(
     "/:postId/like",
     verifyJWT,
     toggleLike
+);
+
+
+router.use(
+    "/:postId/comments",
+    commentRoutes
 );
 
 module.exports = router;
