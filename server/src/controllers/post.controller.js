@@ -1,4 +1,3 @@
-
 const asyncHandler = require("../utils/asyncHandler");
 const ApiResponse = require("../utils/apiResponse");
 
@@ -8,32 +7,43 @@ const {
     getPostByIdService,
     updatePostService,
     deletePostService,
+    toggleLikeService,
 } = require("../services/post.service");
 
 // ======================================
-// Create Post
+// Create
 // ======================================
 
 const createPost = asyncHandler(async (req, res) => {
 
     const post = await createPostService(
+
         req.user._id,
+
         req.body,
+
         req.file
+
     );
 
     return res.status(201).json(
+
         new ApiResponse(
+
             201,
+
             "Post created successfully",
+
             post
+
         )
+
     );
 
 });
 
 // ======================================
-// Get All Posts
+// Get All
 // ======================================
 
 const getAllPosts = asyncHandler(async (req, res) => {
@@ -41,75 +51,136 @@ const getAllPosts = asyncHandler(async (req, res) => {
     const posts = await getAllPostsService();
 
     return res.status(200).json(
+
         new ApiResponse(
+
             200,
+
             "Posts fetched successfully",
+
             posts
+
         )
+
     );
 
 });
 
 // ======================================
-// Get Single Post
+// Get One
 // ======================================
 
 const getPostById = asyncHandler(async (req, res) => {
 
     const post = await getPostByIdService(
+
         req.params.postId
+
     );
 
     return res.status(200).json(
+
         new ApiResponse(
+
             200,
+
             "Post fetched successfully",
+
             post
+
         )
+
     );
 
 });
 
-
+// ======================================
+// Update
+// ======================================
 
 const updatePost = asyncHandler(async (req, res) => {
 
     const post = await updatePostService(
+
         req.params.postId,
+
         req.user._id,
+
         req.body,
+
         req.file
+
     );
 
     return res.status(200).json(
+
         new ApiResponse(
+
             200,
+
             "Post updated successfully",
+
             post
+
         )
+
+    );
+
+});
+
+// ======================================
+// Delete
+// ======================================
+
+const deletePost = asyncHandler(async (req, res) => {
+
+    await deletePostService(
+
+        req.params.postId,
+
+        req.user._id
+
+    );
+
+    return res.status(200).json(
+
+        new ApiResponse(
+
+            200,
+
+            "Post deleted successfully"
+
+        )
+
     );
 
 });
 
 
+const toggleLike = asyncHandler(async (req, res) => {
 
-const deletePost = asyncHandler(async (req, res) => {
-
-    await deletePostService(
+    const result = await toggleLikeService(
         req.params.postId,
         req.user._id
     );
 
     return res.status(200).json(
+
         new ApiResponse(
+
             200,
-            "Post deleted successfully",
-            {}
+
+            result.liked
+                ? "Post liked successfully"
+                : "Post unliked successfully",
+
+            result
+
         )
+
     );
 
 });
-
 
 module.exports = {
     createPost,
@@ -117,4 +188,5 @@ module.exports = {
     getPostById,
     updatePost,
     deletePost,
+    toggleLike,
 };

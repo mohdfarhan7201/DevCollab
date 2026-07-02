@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const verifyJWT = require("../middlewares/auth.middleware");
+
 const upload = require("../middlewares/upload.middleware");
 
 const {
@@ -11,9 +12,9 @@ const {
     getPostById,
     updatePost,
     deletePost,
+    toggleLike,
 } = require("../controllers/post.controller");
 
-// Create Post
 router.post(
     "/",
     verifyJWT,
@@ -21,14 +22,12 @@ router.post(
     createPost
 );
 
-// Get All Posts
 router.get(
     "/",
     verifyJWT,
     getAllPosts
 );
 
-// Get Single Post
 router.get(
     "/:postId",
     verifyJWT,
@@ -46,6 +45,12 @@ router.delete(
     "/:postId",
     verifyJWT,
     deletePost
+);
+
+router.patch(
+    "/:postId/like",
+    verifyJWT,
+    toggleLike
 );
 
 module.exports = router;

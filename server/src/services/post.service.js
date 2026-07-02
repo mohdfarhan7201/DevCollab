@@ -6,9 +6,9 @@ const {
     deleteImage,
 } = require("./cloudinary.service");
 
-// ==========================================
+// ======================================
 // Create Post
-// ==========================================
+// ======================================
 
 const createPostService = async (
     userId,
@@ -19,15 +19,20 @@ const createPostService = async (
     const { content } = data;
 
     if (!content || content.trim() === "") {
+
         throw new ApiError(
             400,
             "Content is required"
         );
+
     }
 
     let image = {
+
         url: "",
+
         public_id: "",
+
     };
 
     if (file) {
@@ -64,9 +69,9 @@ const createPostService = async (
 
 };
 
-// ==========================================
+// ======================================
 // Get All Posts
-// ==========================================
+// ======================================
 
 const getAllPostsService = async () => {
 
@@ -83,9 +88,9 @@ const getAllPostsService = async () => {
 
 };
 
-// ==========================================
+// ======================================
 // Get Single Post
-// ==========================================
+// ======================================
 
 const getPostByIdService = async (
     postId
@@ -111,60 +116,162 @@ const getPostByIdService = async (
 
 };
 
+// ======================================
+// Update Post
+// ======================================
 
 const updatePostService = async (
+
     postId,
+
     userId,
+
     data,
+
     file
+
 ) => {
 
-    const post = await Post.findById(postId);
+    const post =
+        await Post.findById(postId);
 
     if (!post) {
-        throw new ApiError(404, "Post not found");
+
+        throw new ApiError(
+            404,
+            "Post not found"
+        );
+
     }
 
-    // Only owner can update
-    if (post.author.toString() !== userId.toString()) {
+    if (
+        post.author.toString() !==
+        userId.toString()
+    ) {
+
         throw new ApiError(
+
             403,
-            "You are not authorized to update this post"
+
+            "You are not authorized"
+
         );
+
     }
 
     if (data.content) {
+
         post.content = data.content;
+
     }
 
     if (file) {
 
-        // Delete old image
-        if (post.image.public_id) {
-            await deleteImage(post.image.public_id);
+        if (
+            post.image.public_id
+        ) {
+
+            await deleteImage(
+                post.image.public_id
+            );
+
         }
 
-        const uploadedImage = await uploadImage(file.buffer);
+        const uploadedImage =
+            await uploadImage(
+                file.buffer
+            );
 
         post.image = {
-            url: uploadedImage.secure_url,
-            public_id: uploadedImage.public_id,
+
+            url:
+                uploadedImage.secure_url,
+
+            public_id:
+                uploadedImage.public_id,
+
         };
+
     }
 
     await post.save();
 
-    return await Post.findById(post._id)
-        .populate("author", "name username avatar");
+    return await Post.findById(
+        post._id
+    ).populate(
+
+        "author",
+
+        "name username avatar"
+
+    );
+
+};
+
+// ======================================
+// Delete Post
+// ======================================
+
+const deletePostService = async (
+
+    postId,
+
+    userId
+
+) => {
+
+    const post =
+        await Post.findById(postId);
+
+    if (!post) {
+
+        throw new ApiError(
+
+            404,
+
+            "Post not found"
+
+        );
+
+    }
+
+    if (
+        post.author.toString() !==
+        userId.toString()
+    ) {
+
+        throw new ApiError(
+
+            403,
+
+            "You are not authorized"
+
+        );
+
+    }
+
+    if (
+        post.image.public_id
+    ) {
+
+        await deleteImage(
+
+            post.image.public_id
+
+        );
+
+    }
+
+    await post.deleteOne();
 
 };
 
 
+// ======================================
+// Toggle Like
+// ======================================
 
-const deletePostService = async (
-    postId,
-    userId
-) => {
+const toggleLikeService = async (postId, userId) => {
 
     const post = await Post.findById(postId);
 
@@ -172,19 +279,22 @@ const deletePostService = async (
         throw new ApiError(404, "Post not found");
     }
 
-    if (post.author.toString() !== userId.toString()) {
-        throw new ApiError(
-            403,
-            "You are not authorized to delete this post"
-        );
+    const alreadyLiked = post.likes.some(
+        (id) => id.toString() === userId.toString()
+    );
+
+    if (alreadyLiked) {
+        post.likes.pull(userId);
+    } else {
+        post.likes.addToSet(userId);
     }
 
-    if (post.image.public_id) {
-        await deleteImage(post.image.public_id);
-    }
+    await post.save();
 
-    await post.deleteOne();
-
+    return {
+        liked: !alreadyLiked,
+        likesCount: post.likes.length,
+    };
 };
 
 module.exports = {
@@ -193,4 +303,5 @@ module.exports = {
     getPostByIdService,
     updatePostService,
     deletePostService,
+    toggleLikeService,
 };
