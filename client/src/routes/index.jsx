@@ -2,11 +2,23 @@ import { createBrowserRouter } from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
+import AuthLayout from "../layouts/AuthLayout";
 
-// Landing Pages
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+import GuestRoute from "../components/auth/GuestRoute";
+
+// Landing
 import Home from "../pages/Home";
+import NotFound from "../pages/NotFound";
 
-// Dashboard Pages
+// Auth
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
+import VerifyEmail from "../pages/auth/VerifyEmail";
+
+// Dashboard
 import Dashboard from "../pages/dashboard/Dashboard";
 import Projects from "../pages/dashboard/Projects";
 import Teams from "../pages/dashboard/Teams";
@@ -29,42 +41,83 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/dashboard",
-    element: <DashboardLayout />,
+    element: <GuestRoute />,
     children: [
       {
-        index: true,
-        element: <Dashboard />,
-      },
-      {
-        path: "projects",
-        element: <Projects />,
-      },
-      {
-        path: "teams",
-        element: <Teams />,
-      },
-      {
-        path: "messages",
-        element: <Messages />,
-      },
-      {
-        path: "calendar",
-        element: <Calendar />,
-      },
-      {
-        path: "notifications",
-        element: <Notifications />,
-      },
-      {
-        path: "settings",
-        element: <Settings />,
-      },
-      {
-        path: "profile",
-        element: <Profile />,
+        element: <AuthLayout />,
+        children: [
+          {
+            path: "/login",
+            element: <Login />,
+          },
+          {
+            path: "/register",
+            element: <Register />,
+          },
+          {
+            path: "/forgot-password",
+            element: <ForgotPassword />,
+          },
+          {
+            path: "/reset-password",
+            element: <ResetPassword />,
+          },
+          {
+            path: "/verify-email",
+            element: <VerifyEmail />,
+          },
+        ],
       },
     ],
+  },
+
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <Dashboard />,
+          },
+          {
+            path: "projects",
+            element: <Projects />,
+          },
+          {
+            path: "teams",
+            element: <Teams />,
+          },
+          {
+            path: "messages",
+            element: <Messages />,
+          },
+          {
+            path: "calendar",
+            element: <Calendar />,
+          },
+          {
+            path: "notifications",
+            element: <Notifications />,
+          },
+          {
+            path: "settings",
+            element: <Settings />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 
