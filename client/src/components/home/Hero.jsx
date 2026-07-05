@@ -1,97 +1,125 @@
 import { motion } from "framer-motion";
-
+import { ArrowRight, Sparkles } from "lucide-react";
+import HeroPreview from "./HeroPreview";
 import Button from "../ui/Button";
 import Container from "../ui/Container";
-import HeroBackground from "./HeroBackground";
+import AnimatedBackground from "../background/AnimatedBackground";
 
-const Hero = () => {
-  return (
-    <section className="relative overflow-hidden pt-32 pb-24">
+export default function Hero() {
+    return (
+        <section className="relative overflow-hidden py-28"
+            style={{
+                perspective: "1600px",
+            }}>
+            <AnimatedBackground />
 
-      <HeroBackground />
+            <Container>
+                <div className="grid items-center gap-16 lg:grid-cols-2">
+                    {/* Left */}
 
-      <Container>
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="space-y-8"
+                    >
+                        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-4 py-2 backdrop-blur">
+                            <Sparkles className="h-4 w-4 text-primary" />
 
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+                            <span className="text-sm">
+                                Build open-source projects together
+                            </span>
+                        </div>
 
-          <div>
+                        <h1 className="text-5xl font-black leading-tight tracking-tight lg:text-7xl">
+                            Build.
+                            <br />
+                            Collaborate.
+                            <br />
+                            <span className="bg-gradient-to-r from-primary via-blue-500 to-violet-500 bg-clip-text text-transparent">
+                                Ship Faster.
+                            </span>
+                        </h1>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-5xl font-extrabold leading-tight lg:text-7xl"
-            >
-              Build.
+                        <p className="max-w-xl text-lg leading-8 text-muted-foreground">
+                            DevCollab helps developers discover projects, collaborate with
+                            teams, manage contributions, and ship faster—all from one
+                            beautifully designed workspace.
+                        </p>
 
-              <span className="block bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                        <div className="flex flex-wrap gap-4">
+                            <Button size="lg">
+                                Get Started
+                            </Button>
 
-                Collaborate.
+                            <Button variant="outline" size="lg">
+                                Explore Projects
 
-              </span>
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                        </div>
 
-              Grow.
-            </motion.h1>
+                        <div className="flex gap-8 pt-6">
+                            <div>
+                                <h3 className="text-3xl font-bold">15K+</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Developers
+                                </p>
+                            </div>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: .3 }}
-              className="mt-6 max-w-lg text-lg text-gray-600 dark:text-gray-300"
-            >
-              Connect with developers,
-              showcase projects,
-              build together,
-              and grow your career.
-            </motion.p>
+                            <div>
+                                <h3 className="text-3xl font-bold">2.5K+</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Projects
+                                </p>
+                            </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: .5 }}
-              className="mt-8 flex gap-4"
-            >
-              <Button>
+                            <div>
+                                <h3 className="text-3xl font-bold">98%</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Success Rate
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
 
-                Get Started
+                    {/* Right */}
 
-              </Button>
+                    <motion.div
+                        animate={{
+                            y: [0, -12, 0],
+                        }}
+                        transition={{
+                            repeat: Infinity,
+                            duration: 4,
+                        }}
+                        className="absolute -left-6 top-10 h-4 w-4 rounded-full bg-primary shadow-xl"
+                    />
 
-              <Button variant="secondary">
+                    <motion.div
+                        animate={{
+                            y: [0, 10, 0],
+                        }}
+                        transition={{
+                            repeat: Infinity,
+                            duration: 5,
+                        }}
+                        className="absolute -right-4 bottom-12 h-6 w-6 rounded-full bg-violet-500 shadow-xl"
+                    />
 
-                Explore
-
-              </Button>
-
-            </motion.div>
-
-          </div>
-
-          <motion.div
-            animate={{
-              y: [0, -15, 0],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-            }}
-            className="flex justify-center"
-          >
-
-            <img
-              src="https://undraw.co/api/illustrations/developer.svg"
-              alt="Developer"
-              className="w-full max-w-md"
-            />
-
-          </motion.div>
-
-        </div>
-
-      </Container>
-
-    </section>
-  );
-};
-
-export default Hero;
+                    <motion.div
+                        animate={{
+                            y: [0, -15, 0],
+                        }}
+                        transition={{
+                            repeat: Infinity,
+                            duration: 6,
+                        }}
+                        className="absolute right-24 top-0 h-3 w-3 rounded-full bg-sky-500"
+                    />
+                    <HeroPreview />
+                </div>
+            </Container>
+        </section>
+    );
+}
