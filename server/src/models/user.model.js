@@ -4,6 +4,10 @@ const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema(
   {
+    // ======================================================
+    // BASIC INFO
+    // ======================================================
+
     name: {
       type: String,
       required: true,
@@ -20,13 +24,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
-    password: {
-      type: String,
-      required: true,
-      minlength: 6,
-      select: false,
-    },
-
     username: {
       type: String,
       required: true,
@@ -35,16 +32,27 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false,
+    },
+
+    // ======================================================
+    // PROFILE
+    // ======================================================
+
     avatar: {
-    url: {
+      url: {
         type: String,
         default: "",
-    },
-    public_id: {
+      },
+      public_id: {
         type: String,
         default: "",
+      },
     },
-},
 
     bio: {
       type: String,
@@ -58,45 +66,52 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-location: {
-  type: String,
-  default: "",
-},
+    location: {
+      type: String,
+      default: "",
+    },
 
-github: {
-  type: String,
-  default: "",
-},
+    github: {
+      type: String,
+      default: "",
+    },
 
-linkedin: {
-  type: String,
-  default: "",
-},
+    linkedin: {
+      type: String,
+      default: "",
+    },
 
-portfolio: {
-  type: String,
-  default: "",
-},
+    portfolio: {
+      type: String,
+      default: "",
+    },
 
-followers: [
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-],
+    // ======================================================
+    // SOCIAL (FOLLOW SYSTEM)
+    // ======================================================
 
-following: [
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-],
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    // ======================================================
+    // SYSTEM FLAGS
+    // ======================================================
 
     isVerified: {
       type: Boolean,
       default: false,
     },
-    
 
     refreshToken: {
       type: String,
@@ -108,23 +123,37 @@ following: [
   }
 );
 
-// Hash Password
-userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+// ======================================================
+// PASSWORD HASHING
+// ======================================================
 
-  this.password = await bcrypt.hash(this.password, 10);
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
-// Compare Password
+// ======================================================
+// PASSWORD CHECK
+// ======================================================
+
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-// Generate Access Token
+// ======================================================
+// ACCESS TOKEN
+// ======================================================
+
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
-      _id: this._id,
+      userId: this._id,
       email: this.email,
       username: this.username,
     },
@@ -135,11 +164,14 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-// Generate Refresh Token
+// ======================================================
+// REFRESH TOKEN
+// ======================================================
+
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
-      _id: this._id,
+      userId: this._id,
     },
     process.env.REFRESH_TOKEN_SECRET,
     {

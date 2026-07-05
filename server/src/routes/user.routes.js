@@ -6,44 +6,58 @@ const verifyJWT = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload.middleware");
 
 const {
-    updateAvatar,
-    getProfile,
-    updateProfile,
-    searchUsers,
-    getAllUsers,
+  updateAvatar,
+  getProfile,
+  updateProfile,
+  searchUsers,
+  getAllUsers,
 } = require("../controllers/user.controller");
 
-// Avatar
-router.patch(
-    "/avatar",
-    verifyJWT,
-    upload.single("avatar"),
-    updateAvatar
-);
-
-// Profile
-router.get(
-    "/profile",
-    verifyJWT,
-    getProfile
-);
+// ======================================================
+// Avatar Upload
+// ======================================================
 
 router.patch(
-    "/profile",
-    verifyJWT,
-    updateProfile
+  "/avatar",
+  verifyJWT,
+  upload.single("avatar"),
+  updateAvatar
 );
 
-router.get(
-    "/search",
-    verifyJWT,
-    searchUsers
-);
+// ======================================================
+// Profile (current user)
+// ======================================================
 
 router.get(
-    "/",
-    verifyJWT,
-    getAllUsers
+  "/profile",
+  verifyJWT,
+  getProfile
+);
+
+router.patch(
+  "/profile",
+  verifyJWT,
+  updateProfile
+);
+
+// ======================================================
+// Search Users
+// ======================================================
+
+router.get(
+  "/search",
+  verifyJWT,
+  searchUsers
+);
+
+// ======================================================
+// Get All Users
+// ======================================================
+
+router.get(
+  "/",
+  verifyJWT,
+  getAllUsers
 );
 
 module.exports = router;

@@ -28,7 +28,13 @@ import Notifications from "../pages/dashboard/Notifications";
 import Settings from "../pages/dashboard/Settings";
 import Profile from "../pages/dashboard/Profile";
 
+// 🔥 FEED (NEW FEATURE)
+import Feed from "../pages/feed/Feed";
+
 const router = createBrowserRouter([
+  // =========================
+  // PUBLIC LANDING
+  // =========================
   {
     path: "/",
     element: <MainLayout />,
@@ -40,37 +46,28 @@ const router = createBrowserRouter([
     ],
   },
 
+  // =========================
+  // AUTH ROUTES (GUEST ONLY)
+  // =========================
   {
     element: <GuestRoute />,
     children: [
       {
         element: <AuthLayout />,
         children: [
-          {
-            path: "/login",
-            element: <Login />,
-          },
-          {
-            path: "/register",
-            element: <Register />,
-          },
-          {
-            path: "/forgot-password",
-            element: <ForgotPassword />,
-          },
-          {
-            path: "/reset-password",
-            element: <ResetPassword />,
-          },
-          {
-            path: "/verify-email",
-            element: <VerifyEmail />,
-          },
+          { path: "/login", element: <Login /> },
+          { path: "/register", element: <Register /> },
+          { path: "/forgot-password", element: <ForgotPassword /> },
+          { path: "/reset-password", element: <ResetPassword /> },
+          { path: "/verify-email", element: <VerifyEmail /> },
         ],
       },
     ],
   },
 
+  // =========================
+  // PROTECTED APP ROUTES
+  // =========================
   {
     element: <ProtectedRoute />,
     children: [
@@ -78,43 +75,30 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: <DashboardLayout />,
         children: [
-          {
-            index: true,
-            element: <Dashboard />,
-          },
-          {
-            path: "projects",
-            element: <Projects />,
-          },
-          {
-            path: "teams",
-            element: <Teams />,
-          },
-          {
-            path: "messages",
-            element: <Messages />,
-          },
-          {
-            path: "calendar",
-            element: <Calendar />,
-          },
-          {
-            path: "notifications",
-            element: <Notifications />,
-          },
-          {
-            path: "settings",
-            element: <Settings />,
-          },
-          {
-            path: "profile",
-            element: <Profile />,
-          },
+          { index: true, element: <Dashboard /> },
+
+          // Dashboard modules
+          { path: "projects", element: <Projects /> },
+          { path: "teams", element: <Teams /> },
+          { path: "messages", element: <Messages /> },
+          { path: "calendar", element: <Calendar /> },
+          { path: "notifications", element: <Notifications /> },
+          { path: "settings", element: <Settings /> },
+          { path: "profile", element: <Profile /> },
         ],
+      },
+
+      // 🔥 FEED SYSTEM (SOCIAL FEATURE)
+      {
+        path: "/feed",
+        element: <Feed />,
       },
     ],
   },
 
+  // =========================
+  // 404 PAGE
+  // =========================
   {
     path: "*",
     element: <NotFound />,

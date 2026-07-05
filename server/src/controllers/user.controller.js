@@ -2,11 +2,11 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiResponse = require("../utils/apiResponse");
 
 const {
-    updateAvatarService,
-    getProfileService,
-    updateProfileService,
-    searchUsersService,
-    getAllUsersService,
+  updateAvatarService,
+  getProfileService,
+  updateProfileService,
+  searchUsersService,
+  getAllUsersService,
 } = require("../services/user.service");
 
 // ======================================================
@@ -14,17 +14,11 @@ const {
 // ======================================================
 
 const getProfile = asyncHandler(async (req, res) => {
+  const user = await getProfileService(req.user._id);
 
-    const user = await getProfileService(req.user._id);
-
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            "Profile fetched successfully",
-            user
-        )
-    );
-
+  return res.status(200).json(
+    new ApiResponse(200, "Profile fetched successfully", user)
+  );
 });
 
 // ======================================================
@@ -32,23 +26,26 @@ const getProfile = asyncHandler(async (req, res) => {
 // ======================================================
 
 const updateProfile = asyncHandler(async (req, res) => {
+  const updatedUser = await updateProfileService(
+    req.user._id,
+    req.body
+  );
 
-    const updatedUser = await updateProfileService(
-        req.user._id,
-        req.body
-    );
-
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            "Profile updated successfully",
-            updatedUser
-        )
-    );
-
+  return res.status(200).json(
+    new ApiResponse(200, "Profile updated successfully", updatedUser)
+  );
 });
 
+// ======================================================
+// Update Avatar
+// ======================================================
+
 const updateAvatar = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json(
+      new ApiResponse(400, "Avatar file is required")
+    );
+  }
 
   const updatedUser = await updateAvatarService(
     req.user._id,
@@ -56,62 +53,40 @@ const updateAvatar = asyncHandler(async (req, res) => {
   );
 
   return res.status(200).json(
-    new ApiResponse(
-      200,
-      "Avatar updated successfully",
-      updatedUser
-    )
+    new ApiResponse(200, "Avatar updated successfully", updatedUser)
   );
-
 });
 
+// ======================================================
+// Search Users
+// ======================================================
 
 const searchUsers = asyncHandler(async (req, res) => {
+  const users = await searchUsersService(req.query.q || "");
 
-    const users = await searchUsersService(req.query.q);
-
-    return res.status(200).json(
-
-        new ApiResponse(
-
-            200,
-
-            "Users fetched successfully",
-
-            users
-
-        )
-
-    );
-
+  return res.status(200).json(
+    new ApiResponse(200, "Users fetched successfully", users)
+  );
 });
 
+// ======================================================
+// Get All Users
+// ======================================================
+
 const getAllUsers = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
 
-    const { page, limit } = req.query;
+  const result = await getAllUsersService(page, limit);
 
-    const result = await getAllUsersService(page, limit);
-
-    return res.status(200).json(
-
-        new ApiResponse(
-
-            200,
-
-            "Users fetched successfully",
-
-            result
-
-        )
-
-    );
-
+  return res.status(200).json(
+    new ApiResponse(200, "Users fetched successfully", result)
+  );
 });
 
 module.exports = {
-    updateAvatar,
-    getProfile,
-    updateProfile,
-    searchUsers,
-    getAllUsers,
+  updateAvatar,
+  getProfile,
+  updateProfile,
+  searchUsers,
+  getAllUsers,
 };
