@@ -12,7 +12,7 @@ const {
   getCurrentUser,
 } = require("../controllers/auth.controller");
 
-const validate = require("../middlewares/validate.middleware");
+const { validate } = require("../middlewares/validate.middleware.js");
 const { registerSchema, loginSchema } = require("../validations/auth.validation");
 
 // Public Routes

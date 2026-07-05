@@ -27,7 +27,6 @@ const registerUserService = async (userData) => {
     if (existingUser.email === email) {
       throw new ApiError(409, "Email already exists");
     }
-
     throw new ApiError(409, "Username already exists");
   }
 
@@ -57,15 +56,12 @@ const loginUserService = async (loginData) => {
   const { email, password } = loginData;
 
   if (!email || !password) {
-    throw new ApiError(400, "Email/Username and Password are required");
+    throw new ApiError(400, "Email and Password are required");
   }
 
   const user = await User.findOne({
-    $or: [
-      { email },
-      { username: email },
-    ],
-  }).select("+password");
+    $or: [{ email }, { username: email }],
+  }).select("+password +refreshToken");
 
   if (!user) {
     throw new ApiError(404, "User not found");
@@ -79,6 +75,10 @@ const loginUserService = async (loginData) => {
 
   const { accessToken, refreshToken } =
     await generateAccessAndRefreshTokens(user._id);
+
+  // 🔥 IMPORTANT: store refresh token in DB
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
 
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -119,23 +119,27 @@ const refreshAccessTokenService = async (incomingRefreshToken) => {
   }
 
   try {
-    const decodedToken = jwt.verify(
+    const decoded = jwt.verify(
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
 
-    const user = await User.findById(decodedToken._id);
+    const user = await User.findById(decoded.userId);
 
     if (!user) {
       throw new ApiError(401, "Invalid refresh token");
     }
 
     if (incomingRefreshToken !== user.refreshToken) {
-      throw new ApiError(401, "Refresh token expired or already used");
+      throw new ApiError(401, "Refresh token expired or reused");
     }
 
     const { accessToken, refreshToken } =
       await generateAccessAndRefreshTokens(user._id);
+
+    // 🔥 rotate refresh token
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
 
     return {
       accessToken,

@@ -1,4 +1,5 @@
-import { Loader2, Github } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { IoLogoGithub } from "react-icons/io";
 
 export default function AuthLoader({
   title = "Authenticating...",
@@ -8,7 +9,7 @@ export default function AuthLoader({
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-10 text-center shadow-xl">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-          <Github className="h-8 w-8" />
+          <IoLogoGithub className="h-8 w-8" />
         </div>
 
         <Loader2 className="mt-8 h-12 w-12 animate-spin text-primary" />

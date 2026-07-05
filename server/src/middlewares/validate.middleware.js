@@ -1,24 +1,19 @@
 const ApiError = require("../utils/apiError");
 
-const validate = (schema) => {
+function validate(schema) {
+  return (req, res, next) => {
+    try {
+      schema.parse(req.body);
+      next();
+    } catch (err) {
+      return next(
+        new ApiError(
+          400,
+          err.errors?.[0]?.message || "Validation error"
+        )
+      );
+    }
+  };
+}
 
-    return (req, res, next) => {
-
-        const { error } = schema.validate(req.body);
-
-        if (error) {
-            return next(
-                new ApiError(
-                    400,
-                    error.details[0].message
-                )
-            );
-        }
-
-        next();
-
-    };
-
-};
-
-module.exports = validate;
+module.exports = { validate };   // ✅ IMPORTANT CHANGE
