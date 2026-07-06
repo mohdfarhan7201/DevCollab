@@ -46,9 +46,19 @@ import Profile from "../pages/dashboard/Profile";
 import ProjectDetails from "../pages/project/ProjectDetails";
 
 // =========================
+// PROFILE PAGES
+// =========================
+import PublicProfile from "../pages/profile/PublicProfile";
+
+// =========================
 // SOCIAL FEATURES
 // =========================
 import Feed from "../pages/feed/Feed";
+
+// =========================
+// SEARCH
+// =========================
+import Search from "../pages/Search";
 
 const router = createBrowserRouter([
   // =========================
@@ -145,11 +155,18 @@ const router = createBrowserRouter([
       },
 
       // =========================
-      // FEED
+      // SOCIAL FEED
       // =========================
       {
         path: "/feed",
         element: <Feed />,
+      },
+      // =========================
+      // SEARCH
+      // =========================
+      {
+        path: "/search",
+        element: <Search />,
       },
 
       // =========================
@@ -158,6 +175,14 @@ const router = createBrowserRouter([
       {
         path: "/projects/:projectId",
         element: <ProjectDetails />,
+      },
+
+      // =========================
+      // PUBLIC USER PROFILE
+      // =========================
+      {
+        path: "/profile/:userId",
+        element: <PublicProfile />,
       },
     ],
   },
