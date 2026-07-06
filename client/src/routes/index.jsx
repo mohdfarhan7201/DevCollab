@@ -1,24 +1,36 @@
 import { createBrowserRouter } from "react-router-dom";
 
+// =========================
+// LAYOUTS
+// =========================
 import MainLayout from "../layouts/MainLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 import AuthLayout from "../layouts/AuthLayout";
 
+// =========================
+// ROUTE GUARDS
+// =========================
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import GuestRoute from "../components/auth/GuestRoute";
 
-// Landing
+// =========================
+// PUBLIC PAGES
+// =========================
 import Home from "../pages/Home";
 import NotFound from "../pages/NotFound";
 
-// Auth
+// =========================
+// AUTH PAGES
+// =========================
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 import VerifyEmail from "../pages/auth/VerifyEmail";
 
-// Dashboard
+// =========================
+// DASHBOARD PAGES
+// =========================
 import Dashboard from "../pages/dashboard/Dashboard";
 import Projects from "../pages/dashboard/Projects";
 import Teams from "../pages/dashboard/Teams";
@@ -28,12 +40,14 @@ import Notifications from "../pages/dashboard/Notifications";
 import Settings from "../pages/dashboard/Settings";
 import Profile from "../pages/dashboard/Profile";
 
-// 🔥 FEED (NEW FEATURE)
+// =========================
+// SOCIAL FEATURES
+// =========================
 import Feed from "../pages/feed/Feed";
 
 const router = createBrowserRouter([
   // =========================
-  // PUBLIC LANDING
+  // PUBLIC ROUTES
   // =========================
   {
     path: "/",
@@ -47,7 +61,7 @@ const router = createBrowserRouter([
   },
 
   // =========================
-  // AUTH ROUTES (GUEST ONLY)
+  // AUTH (ONLY GUEST)
   // =========================
   {
     element: <GuestRoute />,
@@ -66,7 +80,7 @@ const router = createBrowserRouter([
   },
 
   // =========================
-  // PROTECTED APP ROUTES
+  // PROTECTED APP
   // =========================
   {
     element: <ProtectedRoute />,
@@ -77,7 +91,6 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
 
-          // Dashboard modules
           { path: "projects", element: <Projects /> },
           { path: "teams", element: <Teams /> },
           { path: "messages", element: <Messages /> },
@@ -88,7 +101,9 @@ const router = createBrowserRouter([
         ],
       },
 
-      // 🔥 FEED SYSTEM (SOCIAL FEATURE)
+      // =========================
+      // SOCIAL FEED (MAIN FEATURE)
+      // =========================
       {
         path: "/feed",
         element: <Feed />,
@@ -97,7 +112,7 @@ const router = createBrowserRouter([
   },
 
   // =========================
-  // 404 PAGE
+  // 404
   // =========================
   {
     path: "*",
