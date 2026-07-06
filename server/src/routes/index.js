@@ -10,6 +10,7 @@ const postRoutes = require("./post.routes");
 const followRoutes = require("./follow.routes");
 const feedRoutes = require("./feed.routes");
 const searchRoutes = require("./search.routes");
+const teamRoutes = require("./team.routes");
 
 router.use("/health", healthRoutes);
 router.use("/auth", authRoutes);
@@ -19,5 +20,6 @@ router.use("/posts", postRoutes);
 router.use("/follow", followRoutes);
 router.use("/feed", feedRoutes);
 router.use("/search", searchRoutes);
+router.use("/teams", teamRoutes);
 
 module.exports = router;

@@ -41,6 +41,11 @@ import Settings from "../pages/dashboard/Settings";
 import Profile from "../pages/dashboard/Profile";
 
 // =========================
+// PROJECT PAGES
+// =========================
+import ProjectDetails from "../pages/project/ProjectDetails";
+
+// =========================
 // SOCIAL FEATURES
 // =========================
 import Feed from "../pages/feed/Feed";
@@ -61,7 +66,7 @@ const router = createBrowserRouter([
   },
 
   // =========================
-  // AUTH (ONLY GUEST)
+  // AUTH ROUTES (GUEST ONLY)
   // =========================
   {
     element: <GuestRoute />,
@@ -69,18 +74,33 @@ const router = createBrowserRouter([
       {
         element: <AuthLayout />,
         children: [
-          { path: "/login", element: <Login /> },
-          { path: "/register", element: <Register /> },
-          { path: "/forgot-password", element: <ForgotPassword /> },
-          { path: "/reset-password", element: <ResetPassword /> },
-          { path: "/verify-email", element: <VerifyEmail /> },
+          {
+            path: "/login",
+            element: <Login />,
+          },
+          {
+            path: "/register",
+            element: <Register />,
+          },
+          {
+            path: "/forgot-password",
+            element: <ForgotPassword />,
+          },
+          {
+            path: "/reset-password",
+            element: <ResetPassword />,
+          },
+          {
+            path: "/verify-email",
+            element: <VerifyEmail />,
+          },
         ],
       },
     ],
   },
 
   // =========================
-  // PROTECTED APP
+  // PROTECTED ROUTES
   // =========================
   {
     element: <ProtectedRoute />,
@@ -89,30 +109,61 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: <DashboardLayout />,
         children: [
-          { index: true, element: <Dashboard /> },
-
-          { path: "projects", element: <Projects /> },
-          { path: "teams", element: <Teams /> },
-          { path: "messages", element: <Messages /> },
-          { path: "calendar", element: <Calendar /> },
-          { path: "notifications", element: <Notifications /> },
-          { path: "settings", element: <Settings /> },
-          { path: "profile", element: <Profile /> },
+          {
+            index: true,
+            element: <Dashboard />,
+          },
+          {
+            path: "projects",
+            element: <Projects />,
+          },
+          {
+            path: "teams",
+            element: <Teams />,
+          },
+          {
+            path: "messages",
+            element: <Messages />,
+          },
+          {
+            path: "calendar",
+            element: <Calendar />,
+          },
+          {
+            path: "notifications",
+            element: <Notifications />,
+          },
+          {
+            path: "settings",
+            element: <Settings />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
+          },
         ],
       },
 
       // =========================
-      // SOCIAL FEED (MAIN FEATURE)
+      // FEED
       // =========================
       {
         path: "/feed",
         element: <Feed />,
       },
+
+      // =========================
+      // PROJECT DETAILS
+      // =========================
+      {
+        path: "/projects/:projectId",
+        element: <ProjectDetails />,
+      },
     ],
   },
 
   // =========================
-  // 404
+  // NOT FOUND
   // =========================
   {
     path: "*",

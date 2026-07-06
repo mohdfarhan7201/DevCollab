@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
-
 const User = require("../models/user.model");
 const ApiError = require("../utils/apiError");
-const generateAccessAndRefreshTokens = require("../utils/generateTokens");
+const { generateAccessToken, generateRefreshToken } = require("../utils/generateTokens");
 
 // ======================================================
 // Register User
@@ -73,8 +72,8 @@ const loginUserService = async (loginData) => {
     throw new ApiError(401, "Invalid credentials");
   }
 
-  const { accessToken, refreshToken } =
-    await generateAccessAndRefreshTokens(user._id);
+  const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
 
   // 🔥 IMPORTANT: store refresh token in DB
   user.refreshToken = refreshToken;
@@ -134,8 +133,8 @@ const refreshAccessTokenService = async (incomingRefreshToken) => {
       throw new ApiError(401, "Refresh token expired or reused");
     }
 
-    const { accessToken, refreshToken } =
-      await generateAccessAndRefreshTokens(user._id);
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
     // 🔥 rotate refresh token
     user.refreshToken = refreshToken;
