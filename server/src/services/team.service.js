@@ -2,6 +2,7 @@ const Team = require("../models/team.model");
 const User = require("../models/user.model");
 
 const ApiError = require("../utils/apiError");
+const createNotification = require("./notification.helper");
 
 const {
   uploadImage,
@@ -333,6 +334,22 @@ const inviteMemberService = async (
   });
 
   await team.save();
+
+  try {
+    await createNotification({
+      recipient: memberId,
+      sender: currentUserId,
+      type: "team",
+      title: "Joined Team",
+      message: `You have been added to ${team.name}.`,
+      metadata: {
+        team: team._id,
+      },
+      link: `/dashboard/teams`,
+    });
+  } catch (error) {
+    console.error("Error creating joined team notification:", error.message);
+  }
 
   return await Team.findById(team._id)
     .populate(

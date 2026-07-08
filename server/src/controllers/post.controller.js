@@ -3,8 +3,9 @@ const ApiResponse = require("../utils/apiResponse");
 
 const {
   createPostService,
-  getAllPostsService,
-  getPostByIdService,
+  getFeedService,
+  getUserPostsService,
+  getPostService,
   updatePostService,
   deletePostService,
   toggleLikeService,
@@ -17,8 +18,7 @@ const {
 const createPost = asyncHandler(async (req, res) => {
   const post = await createPostService(
     req.user._id,
-    req.body,
-    req.file
+    req.body
   );
 
   return res.status(201).json(
@@ -31,16 +31,41 @@ const createPost = asyncHandler(async (req, res) => {
 });
 
 // ======================================
-// GET ALL POSTS (FEED)
+// GET FEED
 // ======================================
 
-const getAllPosts = asyncHandler(async (req, res) => {
-  const posts = await getAllPostsService();
+const getFeed = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const posts = await getFeedService(
+    page,
+    limit
+  );
 
   return res.status(200).json(
     new ApiResponse(
       200,
-      "Posts fetched successfully",
+      "Feed fetched successfully",
+      posts
+    )
+  );
+});
+
+// ======================================
+// GET USER POSTS
+// ======================================
+
+const getUserPosts = asyncHandler(async (req, res) => {
+  const posts =
+    await getUserPostsService(
+      req.params.userId
+    );
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "User posts fetched successfully",
       posts
     )
   );
@@ -50,8 +75,8 @@ const getAllPosts = asyncHandler(async (req, res) => {
 // GET SINGLE POST
 // ======================================
 
-const getPostById = asyncHandler(async (req, res) => {
-  const post = await getPostByIdService(
+const getPost = asyncHandler(async (req, res) => {
+  const post = await getPostService(
     req.params.postId
   );
 
@@ -69,12 +94,12 @@ const getPostById = asyncHandler(async (req, res) => {
 // ======================================
 
 const updatePost = asyncHandler(async (req, res) => {
-  const post = await updatePostService(
-    req.params.postId,
-    req.user._id,
-    req.body,
-    req.file
-  );
+  const post =
+    await updatePostService(
+      req.params.postId,
+      req.user._id,
+      req.body
+    );
 
   return res.status(200).json(
     new ApiResponse(
@@ -108,17 +133,16 @@ const deletePost = asyncHandler(async (req, res) => {
 // ======================================
 
 const toggleLike = asyncHandler(async (req, res) => {
-  const result = await toggleLikeService(
-    req.params.postId,
-    req.user._id
-  );
+  const result =
+    await toggleLikeService(
+      req.params.postId,
+      req.user._id
+    );
 
   return res.status(200).json(
     new ApiResponse(
       200,
-      result.liked
-        ? "Post liked successfully"
-        : "Post unliked successfully",
+      "Like updated successfully",
       result
     )
   );
@@ -126,8 +150,9 @@ const toggleLike = asyncHandler(async (req, res) => {
 
 module.exports = {
   createPost,
-  getAllPosts,
-  getPostById,
+  getFeed,
+  getUserPosts,
+  getPost,
   updatePost,
   deletePost,
   toggleLike,

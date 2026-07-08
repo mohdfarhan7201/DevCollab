@@ -1,69 +1,52 @@
 import api from "../lib/axios";
 
-// ======================================
-// GET NOTIFICATIONS
-// ======================================
+// =====================================
+// GET MY NOTIFICATIONS
+// =====================================
 
-export const getNotifications = async (
-  page = 1,
-  limit = 20
-) => {
-  const res = await api.get(
-    `/notifications?page=${page}&limit=${limit}`
-  );
+export const getNotificationsApi = async () => {
+  const { data } = await api.get("/notifications");
 
-  return res.data.data;
+  return data.data;
 };
 
-// ======================================
-// MARK SINGLE AS READ
-// ======================================
+// =====================================
+// MARK AS READ
+// =====================================
 
-export const markNotificationRead = async (
+export const markNotificationReadApi = async (
   notificationId
 ) => {
-  const res = await api.patch(
+  const { data } = await api.patch(
     `/notifications/${notificationId}/read`
   );
 
-  return res.data.data;
+  return data.data;
 };
 
-// ======================================
+// =====================================
 // MARK ALL AS READ
-// ======================================
+// =====================================
 
-export const markAllNotificationsRead =
+export const markAllNotificationsReadApi =
   async () => {
-    const res = await api.patch(
+    const { data } = await api.patch(
       "/notifications/read-all"
     );
 
-    return res.data;
+    return data;
   };
 
-// ======================================
-// DELETE
-// ======================================
+// =====================================
+// DELETE NOTIFICATION
+// =====================================
 
-export const deleteNotification = async (
+export const deleteNotificationApi = async (
   notificationId
 ) => {
-  const res = await api.delete(
+  const { data } = await api.delete(
     `/notifications/${notificationId}`
   );
 
-  return res.data;
-};
-
-// ======================================
-// UNREAD COUNT
-// ======================================
-
-export const getUnreadCount = async () => {
-  const res = await api.get(
-    "/notifications/unread-count"
-  );
-
-  return res.data.data.unread;
+  return data;
 };

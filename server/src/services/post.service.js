@@ -1,66 +1,115 @@
 const Post = require("../models/post.model");
+const User = require("../models/user.model");
 const ApiError = require("../utils/apiError");
-
-const {
-  uploadImage,
-  deleteImage,
-} = require("./cloudinary.service");
+const createNotification = require("./notification.helper");
 
 // ======================================
 // CREATE POST
 // ======================================
 
-const createPostService = async (userId, data, file) => {
-  const { content } = data;
+const createPostService = async (
+  userId,
+  payload
+) => {
+  const {
+    content = "",
+    images = [],
+    tags = [],
+    visibility = "public",
+  } = payload;
 
-  if (!content || content.trim() === "") {
-    throw new ApiError(400, "Content is required");
-  }
-
-  let image = {
-    url: "",
-    public_id: "",
-  };
-
-  if (file) {
-    const uploadedImage = await uploadImage(file.buffer);
-
-    image = {
-      url: uploadedImage.secure_url,
-      public_id: uploadedImage.public_id,
-    };
+  if (
+    !content.trim() &&
+    images.length === 0
+  ) {
+    throw new ApiError(
+      400,
+      "Post cannot be empty"
+    );
   }
 
   const post = await Post.create({
-    content,
-    image,
     author: userId,
+    content: content.trim(),
+    images,
+    tags,
+    visibility,
   });
 
   return await Post.findById(post._id)
-    .populate("author", "name username avatar");
+    .populate(
+      "author",
+      "name username avatar"
+    );
 };
 
 // ======================================
-// GET ALL POSTS (FEED)
+// GET FEED
 // ======================================
 
-const getAllPostsService = async () => {
-  return await Post.find()
-    .populate("author", "name username avatar")
-    .sort({ createdAt: -1 });
+const getFeedService = async (
+  page = 1,
+  limit = 10
+) => {
+  const skip =
+    (page - 1) * limit;
+
+  return await Post.find({
+    isDeleted: false,
+    visibility: "public",
+  })
+    .populate(
+      "author",
+      "name username avatar bio"
+    )
+    .sort({
+      createdAt: -1,
+    })
+    .skip(skip)
+    .limit(limit);
+};
+
+// ======================================
+// GET USER POSTS
+// ======================================
+
+const getUserPostsService = async (
+  userId
+) => {
+  return await Post.find({
+    author: userId,
+    isDeleted: false,
+  })
+    .populate(
+      "author",
+      "name username avatar"
+    )
+    .sort({
+      createdAt: -1,
+    });
 };
 
 // ======================================
 // GET SINGLE POST
 // ======================================
 
-const getPostByIdService = async (postId) => {
-  const post = await Post.findById(postId)
-    .populate("author", "name username avatar");
+const getPostService = async (
+  postId
+) => {
+  const post =
+    await Post.findOne({
+      _id: postId,
+      isDeleted: false,
+    }).populate(
+      "author",
+      "name username avatar bio"
+    );
 
   if (!post) {
-    throw new ApiError(404, "Post not found");
+    throw new ApiError(
+      404,
+      "Post not found"
+    );
   }
 
   return post;
@@ -70,61 +119,89 @@ const getPostByIdService = async (postId) => {
 // UPDATE POST
 // ======================================
 
-const updatePostService = async (postId, userId, data, file) => {
-  const post = await Post.findById(postId);
+const updatePostService = async (
+  postId,
+  userId,
+  payload
+) => {
+  const post =
+    await Post.findById(postId);
 
-  if (!post) {
-    throw new ApiError(404, "Post not found");
+  if (!post || post.isDeleted) {
+    throw new ApiError(
+      404,
+      "Post not found"
+    );
   }
 
-  if (post.author.toString() !== userId.toString()) {
-    throw new ApiError(403, "You are not authorized");
+  if (
+    post.author.toString() !==
+    userId.toString()
+  ) {
+    throw new ApiError(
+      403,
+      "Unauthorized"
+    );
   }
 
-  if (data.content) {
-    post.content = data.content;
-    post.isEdited = true;
-  }
+  post.content =
+    payload.content ??
+    post.content;
 
-  if (file) {
-    if (post.image?.public_id) {
-      await deleteImage(post.image.public_id);
-    }
+  post.images =
+    payload.images ??
+    post.images;
 
-    const uploadedImage = await uploadImage(file.buffer);
+  post.tags =
+    payload.tags ??
+    post.tags;
 
-    post.image = {
-      url: uploadedImage.secure_url,
-      public_id: uploadedImage.public_id,
-    };
-  }
+  post.visibility =
+    payload.visibility ??
+    post.visibility;
+
+  post.isEdited = true;
 
   await post.save();
 
   return await Post.findById(post._id)
-    .populate("author", "name username avatar");
+    .populate(
+      "author",
+      "name username avatar"
+    );
 };
 
 // ======================================
 // DELETE POST
 // ======================================
 
-const deletePostService = async (postId, userId) => {
-  const post = await Post.findById(postId);
+const deletePostService = async (
+  postId,
+  userId
+) => {
+  const post =
+    await Post.findById(postId);
 
-  if (!post) {
-    throw new ApiError(404, "Post not found");
+  if (!post || post.isDeleted) {
+    throw new ApiError(
+      404,
+      "Post not found"
+    );
   }
 
-  if (post.author.toString() !== userId.toString()) {
-    throw new ApiError(403, "You are not authorized");
+  if (
+    post.author.toString() !==
+    userId.toString()
+  ) {
+    throw new ApiError(
+      403,
+      "Unauthorized"
+    );
   }
 
-  if (post.image?.public_id) {
-    await deleteImage(post.image.public_id);
-  }
+  post.isDeleted = true;
 
-  await post.deleteOne();
+  await post.save();
 
   return true;
 };
@@ -133,35 +210,70 @@ const deletePostService = async (postId, userId) => {
 // TOGGLE LIKE
 // ======================================
 
-const toggleLikeService = async (postId, userId) => {
-  const post = await Post.findById(postId);
+const toggleLikeService = async (
+  postId,
+  userId
+) => {
+  const post =
+    await Post.findById(postId);
 
-  if (!post) {
-    throw new ApiError(404, "Post not found");
+  if (!post || post.isDeleted) {
+    throw new ApiError(
+      404,
+      "Post not found"
+    );
   }
 
-  const alreadyLiked = post.likes.some(
-    (id) => id.toString() === userId.toString()
-  );
+  const index =
+    post.likes.findIndex(
+      (id) =>
+        id.toString() ===
+        userId.toString()
+    );
 
-  if (alreadyLiked) {
-    post.likes.pull(userId);
+  let liked = false;
+
+  if (index >= 0) {
+    post.likes.splice(index, 1);
   } else {
-    post.likes.addToSet(userId);
+    post.likes.push(userId);
+    liked = true;
+
+    if (
+      post.author.toString() !==
+      userId.toString()
+    ) {
+     await createNotification({
+  recipient: post.author,
+  sender: userId,
+  type: "like",
+  title: "New Like",
+  message: "liked your post.",
+  metadata: {
+    post: post._id,
+  },
+  link: `/dashboard/feed/${post._id}`,
+});
+    }
   }
+
+  post.likesCount =
+    post.likes.length;
 
   await post.save();
 
   return {
-    liked: !alreadyLiked,
-    likesCount: post.likes.length,
+    liked,
+    likesCount:
+      post.likesCount,
   };
 };
 
 module.exports = {
   createPostService,
-  getAllPostsService,
-  getPostByIdService,
+  getFeedService,
+  getUserPostsService,
+  getPostService,
   updatePostService,
   deletePostService,
   toggleLikeService,

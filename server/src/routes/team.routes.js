@@ -19,105 +19,39 @@ const {
 } = require("../controllers/team.controller");
 
 // ======================================================
-// CREATE TEAM
+// PROTECTED ROUTES
 // ======================================================
 
-router.post(
-  "/",
-  verifyJWT,
-  upload.single("avatar"),
-  createTeam
-);
+router.use(verifyJWT);
 
-// ======================================================
-// GET MY TEAMS
-// ======================================================
+// Create Team
+router.post("/", upload.single("avatar"), createTeam);
 
-router.get(
-  "/my-teams",
-  verifyJWT,
-  getMyTeams
-);
+// Get My Teams
+router.get("/my-teams", getMyTeams);
 
-// ======================================================
-// SEARCH TEAMS
-// ======================================================
+// Search Teams
+router.get("/search", searchTeams);
 
-router.get(
-  "/search",
-  verifyJWT,
-  searchTeams
-);
+// Get All Teams
+router.get("/", getAllTeams);
 
-// ======================================================
-// GET ALL TEAMS
-// ======================================================
+// Get Team by ID
+router.get("/:teamId", getTeamById);
 
-router.get(
-  "/",
-  verifyJWT,
-  getAllTeams
-);
+// Update Team
+router.patch("/:teamId", upload.single("avatar"), updateTeam);
 
-// ======================================================
-// GET TEAM BY ID
-// ======================================================
+// Delete Team
+router.delete("/:teamId", deleteTeam);
 
-router.get(
-  "/:teamId",
-  verifyJWT,
-  getTeamById
-);
+// Invite Member
+router.patch("/:teamId/invite", inviteMember);
 
-// ======================================================
-// UPDATE TEAM
-// ======================================================
+// Remove Member
+router.patch("/:teamId/remove-member", removeMember);
 
-router.patch(
-  "/:teamId",
-  verifyJWT,
-  upload.single("avatar"),
-  updateTeam
-);
-
-// ======================================================
-// DELETE TEAM
-// ======================================================
-
-router.delete(
-  "/:teamId",
-  verifyJWT,
-  deleteTeam
-);
-
-// ======================================================
-// INVITE MEMBER
-// ======================================================
-
-router.patch(
-  "/:teamId/invite",
-  verifyJWT,
-  inviteMember
-);
-
-// ======================================================
-// REMOVE MEMBER
-// ======================================================
-
-router.patch(
-  "/:teamId/remove-member",
-  verifyJWT,
-  removeMember
-);
-
-// ======================================================
-// LEAVE TEAM
-// ======================================================
-
-router.patch(
-  "/:teamId/leave",
-  verifyJWT,
-  leaveTeam
-);
+// Leave Team
+router.patch("/:teamId/leave", leaveTeam);
 
 module.exports = router;

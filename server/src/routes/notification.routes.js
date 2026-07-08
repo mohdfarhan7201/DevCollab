@@ -1,64 +1,40 @@
 const express = require("express");
 
-const router = express.Router();
-
-const verifyJWT = require("../middlewares/auth.middleware");
-
 const {
-  getNotifications,
+  getMyNotifications,
   markAsRead,
-  markAllRead,
+  markAllAsRead,
   deleteNotification,
-  unreadCount,
 } = require("../controllers/notification.controller");
 
-// ======================================
-// GET MY NOTIFICATIONS
-// ======================================
+const auth = require("../middlewares/auth.middleware");
 
-router.get(
-  "/",
-  verifyJWT,
-  getNotifications
-);
+const router = express.Router();
 
 // ======================================
-// UNREAD COUNT
+// All routes require authentication
 // ======================================
 
-router.get(
-  "/unread-count",
-  verifyJWT,
-  unreadCount
-);
+router.use(auth);
 
-// ======================================
-// MARK ALL READ
-// ======================================
+// GET /api/notifications
+router.get("/", getMyNotifications);
 
+// PATCH /api/notifications/read-all
 router.patch(
   "/read-all",
-  verifyJWT,
-  markAllRead
+  markAllAsRead
 );
 
-// ======================================
-// MARK SINGLE READ
-// ======================================
-
+// PATCH /api/notifications/:notificationId/read
 router.patch(
   "/:notificationId/read",
-  verifyJWT,
   markAsRead
 );
 
-// ======================================
-// DELETE
-// ======================================
-
+// DELETE /api/notifications/:notificationId
 router.delete(
   "/:notificationId",
-  verifyJWT,
   deleteNotification
 );
 

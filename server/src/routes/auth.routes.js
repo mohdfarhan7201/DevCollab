@@ -2,7 +2,9 @@ const express = require("express");
 
 const router = express.Router();
 
+
 const verifyJWT = require("../middlewares/auth.middleware");
+
 
 const {
   registerUser,
@@ -12,18 +14,50 @@ const {
   getCurrentUser,
 } = require("../controllers/auth.controller");
 
-const { validate } = require("../middlewares/validate.middleware.js");
-const { registerSchema, loginSchema } = require("../validations/auth.validation");
 
+const validate = require("../middlewares/validate.middleware");
+
+
+const {
+  registerSchema,
+  loginSchema,
+} = require("../validations/auth.validation");
+
+
+
+// =====================
 // Public Routes
+// =====================
 
-router.post("/register", validate(registerSchema), registerUser);
 
-router.post("/login", validate(loginSchema), loginUser);
+router.post(
+  "/register",
+  validate(registerSchema),
+  registerUser
+);
 
-router.post("/refresh-token", refreshAccessToken);
 
+
+router.post(
+  "/login",
+  validate(loginSchema),
+  loginUser
+);
+
+
+
+router.post(
+  "/refresh-token",
+  refreshAccessToken
+);
+
+
+
+
+// =====================
 // Protected Routes
+// =====================
+
 
 router.post(
   "/logout",
@@ -31,10 +65,14 @@ router.post(
   logoutUser
 );
 
+
+
 router.get(
   "/me",
   verifyJWT,
   getCurrentUser
 );
+
+
 
 module.exports = router;

@@ -1,139 +1,105 @@
 const Notification = require("../models/notification.model");
+const ApiError = require("../utils/apiError");
 
-// ======================================================
-// CREATE NOTIFICATION
-// ======================================================
-
-const createNotificationService = async ({
-  recipient,
-  sender,
-  type,
-  title,
-  message,
-  link = "",
-  metadata = {},
-}) => {
-  return Notification.create({
-    recipient,
-    sender,
-    type,
-    title,
-    message,
-    link,
-    metadata,
-  });
-};
-
-// ======================================================
+// ======================================
 // GET MY NOTIFICATIONS
-// ======================================================
+// ======================================
 
-const getNotificationsService = async (
-  userId,
-  page = 1,
-  limit = 20
+const getMyNotificationsService = async (
+  userId
 ) => {
-  page = Number(page);
-  limit = Number(limit);
-
-  const notifications =
-    await Notification.find({
-      recipient: userId,
-    })
-      .populate(
-        "sender",
-        "name username avatar"
-      )
-      .sort({
-        createdAt: -1,
-      })
-      .skip((page - 1) * limit)
-      .limit(limit);
-
-  const total = await Notification.countDocuments({
+  return await Notification.find({
     recipient: userId,
-  });
+  })
+    .populate(
+      "sender",
+      "name username avatar"
+    )
+    .sort({
+      createdAt: -1,
+    });
+};
 
-  return {
-    notifications,
-    total,
-    page,
-    pages: Math.ceil(total / limit),
+// ======================================
+// MARK NOTIFICATION AS READ
+// ======================================
+
+const markNotificationReadService =
+  async (
+    notificationId,
+    userId
+  ) => {
+    const notification =
+      await Notification.findOne({
+        _id: notificationId,
+        recipient: userId,
+      });
+
+    if (!notification) {
+      throw new ApiError(
+        404,
+        "Notification not found"
+      );
+    }
+
+    notification.isRead = true;
+
+    await notification.save();
+
+    return notification;
   };
-};
 
-// ======================================================
-// MARK AS READ
-// ======================================================
+// ======================================
+// MARK ALL NOTIFICATIONS AS READ
+// ======================================
 
-const markAsReadService = async (
-  notificationId,
-  userId
-) => {
-  return Notification.findOneAndUpdate(
-    {
-      _id: notificationId,
-      recipient: userId,
-    },
-    {
-      read: true,
-    },
-    {
-      new: true,
+const markAllNotificationsReadService =
+  async (userId) => {
+    await Notification.updateMany(
+      {
+        recipient: userId,
+        isRead: false,
+      },
+      {
+        $set: {
+          isRead: true,
+        },
+      }
+    );
+
+    return true;
+  };
+
+// ======================================
+// DELETE NOTIFICATION
+// ======================================
+
+const deleteNotificationService =
+  async (
+    notificationId,
+    userId
+  ) => {
+    const notification =
+      await Notification.findOne({
+        _id: notificationId,
+        recipient: userId,
+      });
+
+    if (!notification) {
+      throw new ApiError(
+        404,
+        "Notification not found"
+      );
     }
-  );
-};
 
-// ======================================================
-// MARK ALL READ
-// ======================================================
+    await notification.deleteOne();
 
-const markAllReadService = async (
-  userId
-) => {
-  await Notification.updateMany(
-    {
-      recipient: userId,
-      read: false,
-    },
-    {
-      read: true,
-    }
-  );
-};
-
-// ======================================================
-// DELETE
-// ======================================================
-
-const deleteNotificationService = async (
-  id,
-  userId
-) => {
-  await Notification.findOneAndDelete({
-    _id: id,
-    recipient: userId,
-  });
-};
-
-// ======================================================
-// UNREAD COUNT
-// ======================================================
-
-const unreadCountService = async (
-  userId
-) => {
-  return Notification.countDocuments({
-    recipient: userId,
-    read: false,
-  });
-};
+    return true;
+  };
 
 module.exports = {
-  createNotificationService,
-  getNotificationsService,
-  markAsReadService,
-  markAllReadService,
+  getMyNotificationsService,
+  markNotificationReadService,
+  markAllNotificationsReadService,
   deleteNotificationService,
-  unreadCountService,
 };

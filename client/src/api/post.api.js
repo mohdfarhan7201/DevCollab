@@ -1,24 +1,105 @@
 import api from "../lib/axios";
 
+// ======================================
 // GET FEED
-export const getFeed = async () => {
-  const res = await api.get("/posts/feed");
-  return res.data.data;
+// ======================================
+
+export const getFeedApi = async (
+  page = 1,
+  limit = 10
+) => {
+  const { data } = await api.get(
+    `/posts?page=${page}&limit=${limit}`
+  );
+
+  return data.data;
 };
 
-// CREATE POST (UPDATED FOR IMAGE)
-export const createPost = async (data) => {
-  const res = await api.post("/posts", data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+// ======================================
+// GET SINGLE POST
+// ======================================
 
-  return res.data.data;
+export const getPostApi = async (
+  postId
+) => {
+  const { data } = await api.get(
+    `/posts/${postId}`
+  );
+
+  return data.data;
 };
 
-// LIKE POST
-export const likePost = async (postId) => {
-  const res = await api.patch(`/posts/${postId}/like`);
-  return res.data.data;
-};
+// ======================================
+// GET USER POSTS
+// ======================================
+
+export const getUserPostsApi =
+  async (userId) => {
+    const { data } =
+      await api.get(
+        `/posts/user/${userId}`
+      );
+
+    return data.data;
+  };
+
+// ======================================
+// CREATE POST
+// ======================================
+
+export const createPostApi =
+  async (payload) => {
+    const { data } =
+      await api.post(
+        "/posts",
+        payload
+      );
+
+    return data.data;
+  };
+
+// ======================================
+// UPDATE POST
+// ======================================
+
+export const updatePostApi =
+  async (
+    postId,
+    payload
+  ) => {
+    const { data } =
+      await api.patch(
+        `/posts/${postId}`,
+        payload
+      );
+
+    return data.data;
+  };
+
+// ======================================
+// DELETE POST
+// ======================================
+
+export const deletePostApi =
+  async (postId) => {
+    const { data } =
+      await api.delete(
+        `/posts/${postId}`
+      );
+
+    return data.data;
+  };
+
+// ======================================
+// TOGGLE LIKE
+// ======================================
+
+export const toggleLikeApi =
+  async (postId) => {
+    const { data } =
+      await api.patch(
+        `/posts/${postId}/like`
+      );
+
+    return data.data;
+  };

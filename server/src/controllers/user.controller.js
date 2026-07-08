@@ -7,6 +7,7 @@ const {
   updateProfileService,
   searchUsersService,
   getAllUsersService,
+  getUserByIdService,
 } = require("../services/user.service");
 
 // ======================================================
@@ -70,6 +71,29 @@ const searchUsers = asyncHandler(async (req, res) => {
 });
 
 // ======================================================
+// Get User By Id
+// ======================================================
+
+const getUserById = asyncHandler(
+  async (req, res) => {
+
+    const user =
+      await getUserByIdService(
+        req.params.userId,
+        req.user._id
+      );
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        "User fetched successfully",
+        user
+      )
+    );
+  }
+);
+
+// ======================================================
 // Get All Users
 // ======================================================
 
@@ -89,4 +113,5 @@ module.exports = {
   updateProfile,
   searchUsers,
   getAllUsers,
+  getUserById,
 };

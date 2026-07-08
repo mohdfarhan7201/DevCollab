@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import {
   Bell,
   CheckCircle2,
@@ -12,10 +13,10 @@ import {
 } from "lucide-react";
 
 import {
-  getNotifications,
-  markNotificationRead,
-  markAllNotificationsRead,
-  deleteNotification,
+  getNotificationsApi,
+  markNotificationReadApi,
+  markAllNotificationsReadApi,
+  deleteNotificationApi,
 } from "../../api/notification.api";
 
 function NotificationIcon({ type }) {
@@ -48,6 +49,27 @@ function NotificationIcon({ type }) {
         </div>
       );
 
+    case "follow":
+      return (
+        <div className="rounded-xl bg-pink-500/10 p-3 text-pink-500">
+          <UserPlus className="h-5 w-5" />
+        </div>
+      );
+
+    case "comment":
+      return (
+        <div className="rounded-xl bg-blue-500/10 p-3 text-blue-500">
+          <MessageSquare className="h-5 w-5" />
+        </div>
+      );
+
+    case "like":
+      return (
+        <div className="rounded-xl bg-red-500/10 p-3 text-red-500">
+          ❤️
+        </div>
+      );
+
     default:
       return (
         <div className="rounded-xl bg-primary/10 p-3 text-primary">
@@ -62,13 +84,13 @@ export default function Notifications() {
   const [loading, setLoading] = useState(true);
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
-  const loadNotifications = async () => {
+  const fetchNotifications = async () => {
     try {
       setLoading(true);
 
-      const data = await getNotifications();
+      const response = await getNotificationsApi();
 
-      setNotifications(data.notifications || []);
+      setNotifications(response.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -77,47 +99,42 @@ export default function Notifications() {
   };
 
   useEffect(() => {
-    loadNotifications();
+    fetchNotifications();
   }, []);
 
   const unreadCount = useMemo(
-    () =>
-      notifications.filter(
-        (item) => !item.read
-      ).length,
+    () => notifications.filter((item) => !item.isRead).length,
     [notifications]
   );
 
   const visibleNotifications = useMemo(() => {
     if (!showUnreadOnly) return notifications;
 
-    return notifications.filter(
-      (item) => !item.read
-    );
+    return notifications.filter((item) => !item.isRead);
   }, [notifications, showUnreadOnly]);
 
-  const handleMarkAllRead = async () => {
+  const markAllAsRead = async () => {
     try {
-      await markAllNotificationsRead();
-      loadNotifications();
+      await markAllNotificationsReadApi();
+      fetchNotifications();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleMarkRead = async (id) => {
+  const markAsRead = async (id) => {
     try {
-      await markNotificationRead(id);
-      loadNotifications();
+      await markNotificationReadApi(id);
+      fetchNotifications();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleDelete = async (id) => {
+  const removeNotification = async (id) => {
     try {
-      await deleteNotification(id);
-      loadNotifications();
+      await deleteNotificationApi(id);
+      fetchNotifications();
     } catch (err) {
       console.error(err);
     }
@@ -125,16 +142,16 @@ export default function Notifications() {
 
   if (loading) {
     return (
-      <div className="p-10 text-center">
-        Loading notifications...
+      <div className="flex h-80 items-center justify-center">
+        <div className="text-lg">
+          Loading notifications...
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-3xl font-bold">
@@ -155,9 +172,7 @@ export default function Notifications() {
 
         <div className="flex flex-wrap gap-3">
           <button
-            onClick={() =>
-              setShowUnreadOnly((prev) => !prev)
-            }
+            onClick={() => setShowUnreadOnly((prev) => !prev)}
             className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 hover:bg-muted"
           >
             <Filter className="h-4 w-4" />
@@ -165,7 +180,7 @@ export default function Notifications() {
           </button>
 
           <button
-            onClick={handleMarkAllRead}
+            onClick={markAllAsRead}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground hover:opacity-90"
           >
             <Check className="h-4 w-4" />
@@ -173,8 +188,6 @@ export default function Notifications() {
           </button>
         </div>
       </div>
-
-      {/* Empty */}
 
       {visibleNotifications.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-16 text-center">
@@ -194,14 +207,10 @@ export default function Notifications() {
             <div
               key={notification._id}
               className={`flex gap-5 border-b border-border p-6 transition hover:bg-muted/40 ${
-                !notification.read
-                  ? "bg-primary/5"
-                  : ""
+                !notification.isRead ? "bg-primary/5" : ""
               }`}
             >
-              <NotificationIcon
-                type={notification.type}
-              />
+              <NotificationIcon type={notification.type} />
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -211,31 +220,27 @@ export default function Notifications() {
                         {notification.title}
                       </h2>
 
-                      {!notification.read && (
+                      {!notification.isRead && (
                         <span className="h-2.5 w-2.5 rounded-full bg-primary" />
                       )}
                     </div>
 
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {notification.message}
+                      {notification.sender?.name
+                        ? `${notification.sender.name} ${notification.message}`
+                        : notification.message}
                     </p>
                   </div>
 
                   <span className="whitespace-nowrap text-sm text-muted-foreground">
-                    {new Date(
-                      notification.createdAt
-                    ).toLocaleString()}
+                    {new Date(notification.createdAt).toLocaleString()}
                   </span>
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-3">
-                  {!notification.read && (
+                  {!notification.isRead && (
                     <button
-                      onClick={() =>
-                        handleMarkRead(
-                          notification._id
-                        )
-                      }
+                      onClick={() => markAsRead(notification._id)}
                       className="rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted"
                     >
                       Mark as Read
@@ -244,9 +249,7 @@ export default function Notifications() {
 
                   <button
                     onClick={() =>
-                      handleDelete(
-                        notification._id
-                      )
+                      removeNotification(notification._id)
                     }
                     className="rounded-lg border border-red-500/20 px-4 py-2 text-sm text-red-500 hover:bg-red-500/10"
                   >

@@ -3,103 +3,148 @@ const Project = require("../models/project.model");
 const Post = require("../models/post.model");
 
 // ======================================
-// Search Users
+// SEARCH USERS
 // ======================================
 
-const searchUsersService = async (keyword) => {
+const searchUsersService = async (
+  keyword = ""
+) => {
+  keyword = keyword.trim();
 
-    return await User.find({
+  if (!keyword) {
+    return [];
+  }
 
-        $or: [
-
-            {
-                name: {
-                    $regex: keyword,
-                    $options: "i",
-                },
-            },
-
-            {
-                username: {
-                    $regex: keyword,
-                    $options: "i",
-                },
-            },
-
-        ],
-
-    }).select("-password -refreshToken");
-
+  return await User.find({
+    $or: [
+      {
+        name: {
+          $regex: keyword,
+          $options: "i",
+        },
+      },
+      {
+        username: {
+          $regex: keyword,
+          $options: "i",
+        },
+      },
+      {
+        bio: {
+          $regex: keyword,
+          $options: "i",
+        },
+      },
+      {
+        skills: {
+          $elemMatch: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
+      },
+    ],
+  })
+    .select(
+      "-password -refreshToken"
+    )
+    .sort({
+      followersCount: -1,
+      createdAt: -1,
+    })
+    .limit(20);
 };
 
 // ======================================
-// Search Projects
+// SEARCH PROJECTS
 // ======================================
 
-const searchProjectsService = async (keyword) => {
+const searchProjectsService =
+  async (keyword = "") => {
+    keyword = keyword.trim();
+
+    if (!keyword) {
+      return [];
+    }
 
     return await Project.find({
-
-        $or: [
-
-            {
-                title: {
-                    $regex: keyword,
-                    $options: "i",
-                },
+      $or: [
+        {
+          title: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
+        {
+          techStack: {
+            $elemMatch: {
+              $regex: keyword,
+              $options: "i",
             },
-
-            {
-                description: {
-                    $regex: keyword,
-                    $options: "i",
-                },
-            },
-
-        ],
-
-    }).populate(
-
+          },
+        },
+      ],
+    })
+      .populate(
         "owner",
-
         "name username avatar"
-
-    );
-
-};
+      )
+      .sort({
+        createdAt: -1,
+      })
+      .limit(20);
+  };
 
 // ======================================
-// Search Posts
+// SEARCH POSTS
 // ======================================
 
-const searchPostsService = async (keyword) => {
+const searchPostsService =
+  async (keyword = "") => {
+    keyword = keyword.trim();
+
+    if (!keyword) {
+      return [];
+    }
 
     return await Post.find({
-
-        content: {
-
+      isDeleted: false,
+      visibility: "public",
+      $or: [
+        {
+          content: {
             $regex: keyword,
-
             $options: "i",
-
+          },
         },
-
-    }).populate(
-
+        {
+          tags: {
+            $elemMatch: {
+              $regex: keyword,
+              $options: "i",
+            },
+          },
+        },
+      ],
+    })
+      .populate(
         "author",
-
         "name username avatar"
-
-    );
-
-};
+      )
+      .sort({
+        createdAt: -1,
+      })
+      .limit(20);
+  };
 
 module.exports = {
-
-    searchUsersService,
-
-    searchProjectsService,
-
-    searchPostsService,
-
+  searchUsersService,
+  searchProjectsService,
+  searchPostsService,
 };

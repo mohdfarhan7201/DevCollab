@@ -10,7 +10,7 @@ import {
 } from "../../api/project.api";
 
 import {
-  getFeed,
+  getUserPostsApi,
 } from "../../api/post.api";
 
 import PublicProfileHeader from "../../components/profile/PublicProfileHeader";
@@ -52,20 +52,13 @@ export default function PublicProfile() {
 
         setProjects(
           projectData.projects ||
-            projectData
+          projectData
         );
 
         // Load Posts
 
-        const feed =
-          await getFeed();
-
         const userPosts =
-          feed.filter(
-            (post) =>
-              post.author?._id ===
-              userId
-          );
+          await getUserPostsApi(userId);
 
         setPosts(userPosts);
       } catch (err) {
@@ -117,7 +110,7 @@ export default function PublicProfile() {
         profile={profile}
       />
 
-            {/* ========================= */}
+      {/* ========================= */}
       {/* PROJECTS */}
       {/* ========================= */}
 
@@ -159,8 +152,8 @@ export default function PublicProfile() {
               <ProjectCard
                 key={project._id}
                 project={project}
-                onDelete={() => {}}
-                onUpdated={() => {}}
+                onDelete={() => { }}
+                onUpdated={() => { }}
               />
             ))}
           </div>

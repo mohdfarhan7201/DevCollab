@@ -12,7 +12,7 @@ const app = express();
 
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
-  "http://localhost:5173",
+  "http://localhost:5174",
 ].filter(Boolean);
 
 // =====================
@@ -63,17 +63,8 @@ app.use(
 app.use("/api/v1", routes);
 
 // =====================
-// Error handler (IMPORTANT)
+// Error handler
 // =====================
-app.use((err, req, res, next) => {
-  console.error("🔥 ERROR:", err.message);
-
-  res.status(500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
-
 app.use(errorHandler);
 
 module.exports = app;

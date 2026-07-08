@@ -39,6 +39,7 @@ import Calendar from "../pages/dashboard/Calendar";
 import Notifications from "../pages/dashboard/Notifications";
 import Settings from "../pages/dashboard/Settings";
 import Profile from "../pages/dashboard/Profile";
+import Feed from "../pages/dashboard/Feed";
 
 // =========================
 // PROJECT PAGES
@@ -53,7 +54,7 @@ import PublicProfile from "../pages/profile/PublicProfile";
 // =========================
 // SOCIAL FEATURES
 // =========================
-import Feed from "../pages/feed/Feed";
+// import Feed from "../pages/feed/Feed";
 
 // =========================
 // SEARCH
@@ -150,6 +151,10 @@ const router = createBrowserRouter([
           {
             path: "profile",
             element: <Profile />,
+          },
+          {
+            path: "feed",
+            element: <Feed />,
           },
         ],
       },

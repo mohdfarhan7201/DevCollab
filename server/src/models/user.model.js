@@ -175,4 +175,15 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
+// ======================================================
+// INDEXES
+// ======================================================
+
+userSchema.index({ email: 1 });
+userSchema.index({ username: 1 });
+
+// ======================================================
+// EXPORT
+// ======================================================
+
 module.exports = mongoose.model("User", userSchema);

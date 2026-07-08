@@ -16,4 +16,4 @@ function validate(schema) {
   };
 }
 
-module.exports = { validate };   // ✅ IMPORTANT CHANGE
+module.exports = validate;

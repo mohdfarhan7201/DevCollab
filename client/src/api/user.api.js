@@ -1,57 +1,98 @@
 import api from "../lib/axios";
 
 // ======================================
-// CURRENT USER PROFILE
+// Current User Profile
 // ======================================
 
 export const getProfile = async () => {
-  const { data } = await api.get("/users/profile");
-  return data.data;
+  const res = await api.get("/users/profile");
+  return res.data.data;
 };
 
 // ======================================
-// GET USER BY ID
+// Public User Profile
 // ======================================
 
 export const getUserById = async (userId) => {
-  const { data } = await api.get(`/users/${userId}`);
-  return data.data;
+  const res = await api.get(`/users/${userId}`);
+  return res.data.data;
 };
 
 // ======================================
-// SEARCH USERS
+// Update Profile
 // ======================================
 
-export const searchUsers = async (query = "") => {
-  const { data } = await api.get("/users/search", {
-    params: {
-      q: query,
-    },
-  });
+export const updateProfile = async (data) => {
+  const res = await api.patch(
+    "/users/profile",
+    data
+  );
 
-  return data.data;
+  return res.data.data;
 };
 
 // ======================================
-// GET ALL USERS
+// Update Avatar
 // ======================================
 
-export const getAllUsers = async (page = 1, limit = 20) => {
-  const { data } = await api.get("/users", {
-    params: {
-      page,
-      limit,
-    },
-  });
+export const updateAvatar = async (file) => {
+  const formData = new FormData();
 
-  return data.data;
+  formData.append("avatar", file);
+
+  const res = await api.patch(
+    "/users/avatar",
+    formData,
+    {
+      headers: {
+        "Content-Type":
+          "multipart/form-data",
+      },
+    }
+  );
+
+  return res.data.data;
 };
 
 // ======================================
-// FOLLOW / UNFOLLOW
+// Search Users
 // ======================================
 
-export const toggleFollow = async (userId) => {
-  const { data } = await api.patch(`/follow/${userId}`);
-  return data.data;
+export const searchUsers = async (query) => {
+  const res = await api.get(
+    `/users/search?q=${encodeURIComponent(
+      query
+    )}`
+  );
+
+  return res.data.data;
+};
+
+// ======================================
+// Get All Users
+// ======================================
+
+export const getAllUsers = async (
+  page = 1,
+  limit = 10
+) => {
+  const res = await api.get(
+    `/users?page=${page}&limit=${limit}`
+  );
+
+  return res.data.data;
+};
+
+// ======================================
+// Follow / Unfollow
+// ======================================
+
+export const toggleFollow = async (
+  userId
+) => {
+  const res = await api.patch(
+    `/follow/${userId}`
+  );
+
+  return res.data.data;
 };

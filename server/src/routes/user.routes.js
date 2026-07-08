@@ -11,6 +11,7 @@ const {
   updateProfile,
   searchUsers,
   getAllUsers,
+  getUserById,
 } = require("../controllers/user.controller");
 
 // ======================================================
@@ -48,6 +49,16 @@ router.get(
   "/search",
   verifyJWT,
   searchUsers
+);
+
+// ======================================================
+// Get User By Id
+// ======================================================
+
+router.get(
+  "/:userId",
+  verifyJWT,
+  getUserById
 );
 
 // ======================================================

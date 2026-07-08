@@ -2,25 +2,52 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
   {
-    content: {
-      type: String,
+    post: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
       required: true,
-      trim: true,
-      maxlength: 500,
+      index: true,
     },
 
-    author: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
 
-    post: {
+    parentComment: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
-      required: true,
+      ref: "Comment",
+      default: null,
       index: true,
+    },
+
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 1000,
+    },
+
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
+
+    repliesCount: {
+      type: Number,
+      default: 0,
+    },
+
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -28,4 +55,21 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Comment", commentSchema);
+// ======================================
+// INDEXES
+// ======================================
+
+commentSchema.index({
+  post: 1,
+  createdAt: -1,
+});
+
+commentSchema.index({
+  parentComment: 1,
+  createdAt: 1,
+});
+
+module.exports = mongoose.model(
+  "Comment",
+  commentSchema
+);

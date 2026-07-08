@@ -2,32 +2,6 @@ const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema(
   {
-    // ======================================================
-    // CONTENT
-    // ======================================================
-
-    content: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 1000,
-    },
-
-    image: {
-      url: {
-        type: String,
-        default: "",
-      },
-      public_id: {
-        type: String,
-        default: "",
-      },
-    },
-
-    // ======================================================
-    // AUTHOR
-    // ======================================================
-
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -35,9 +9,25 @@ const postSchema = new mongoose.Schema(
       index: true,
     },
 
-    // ======================================================
-    // SOCIAL FEATURES
-    // ======================================================
+    content: {
+      type: String,
+      trim: true,
+      maxlength: 5000,
+      default: "",
+    },
+
+    images: [
+      {
+        type: String,
+      },
+    ],
+
+    tags: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
 
     likes: [
       {
@@ -46,45 +36,81 @@ const postSchema = new mongoose.Schema(
       },
     ],
 
-    comments: [
-      {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        text: {
-          type: String,
-          required: true,
-          trim: true,
-          maxlength: 500,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
 
-    // ======================================================
-    // OPTIONAL FEATURES (FUTURE READY)
-    // ======================================================
+    commentsCount: {
+      type: Number,
+      default: 0,
+    },
+
+    sharesCount: {
+      type: Number,
+      default: 0,
+    },
+
+    views: {
+      type: Number,
+      default: 0,
+    },
+
+    visibility: {
+      type: String,
+      enum: [
+        "public",
+        "followers",
+        "private",
+      ],
+      default: "public",
+      index: true,
+    },
 
     isEdited: {
       type: Boolean,
       default: false,
     },
 
-    tags: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Post", postSchema);
+// ======================================
+// INDEXES
+// ======================================
+
+postSchema.index({
+  createdAt: -1,
+});
+
+postSchema.index({
+  author: 1,
+  createdAt: -1,
+});
+
+postSchema.index({
+  visibility: 1,
+  createdAt: -1,
+});
+
+postSchema.index({
+  tags: 1,
+});
+
+postSchema.index({
+  content: "text",
+  tags: "text",
+});
+
+module.exports = mongoose.model(
+  "Post",
+  postSchema
+);
